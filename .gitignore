@@ -1,0 +1,21 @@
+.DS_Store
+node_modules
+app/dist
+
+
+# env files
+.env
+app/.env
+.env.*.local
+
+# Log files
+npm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
