@@ -14,8 +14,6 @@ FROM node:16-alpine
 
 WORKDIR /app
 
-ARG RELEASE
-ENV SENTRY_RELEASE=${RELEASE:-dev}
 ENV NODE_ENV=production
 ENV DEBUG=false
 
