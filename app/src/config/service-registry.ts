@@ -48,7 +48,10 @@ export class ServiceRegistry {
 
         this.services
             .forEach(service => {
-                promises.push(service.init()
+                const envVars = {};
+                service.environmentVariables.forEach(envVar => envVars[envVar] = process.env[envVar]);
+
+                promises.push(service.init(envVars)
                     .catch(() => console.warn(`Failed to initialize service ${service.name}`))
                     .then(() => console.info(`Successfully initialized service ${service.name}`)));
             });

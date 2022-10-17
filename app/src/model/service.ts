@@ -1,6 +1,6 @@
 export interface Service {
-    name: string;
-    init: () => Promise<void>;
-    destruct: () => Promise<void>;
-    environmentVariables: string[];
+    readonly name: string;
+    readonly environmentVariables: string[];
+    readonly init: (envVars: Record<string, string>) => Promise<void>;
+    readonly destruct: () => Promise<void>;
 }
