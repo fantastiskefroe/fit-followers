@@ -1,18 +1,20 @@
 import {Service} from '../model/service';
 import {InfluxDB, Point, WriteApi} from '@influxdata/influxdb-client';
 
+enum EnvVar {
+    INFLUX_URL = 'INFLUX_URL',
+    INFLUX_TOKEN = 'INFLUX_TOKEN',
+    INFLUX_ORG = 'INFLUX_ORG',
+    INFLUX_BUCKET = 'INFLUX_BUCKET'
+}
+
 export class InfluxService implements Service {
     public readonly name = 'Influx';
-    public readonly environmentVariables = [
-        'INFLUX_URL',
-        'INFLUX_TOKEN',
-        'INFLUX_ORG',
-        'INFLUX_BUCKET'
-    ];
+    public readonly environmentVariables = Object.keys(EnvVar);
 
     private influxWriteApi: WriteApi;
 
-    public init(envVars: Record<string, string>): Promise<void> {
+    public init(envVars: Record<EnvVar, string>): Promise<void> {
         const influxDB = new InfluxDB({url: envVars.INFLUX_URL, token: envVars.INFLUX_TOKEN});
         this.influxWriteApi = influxDB.getWriteApi(envVars.INFLUX_ORG, envVars.INFLUX_BUCKET, 's');
 

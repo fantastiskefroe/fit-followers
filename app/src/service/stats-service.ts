@@ -5,21 +5,26 @@ import {Service} from '../model/service';
 import {InfluxService} from './influx-service';
 import {Point} from '@influxdata/influxdb-client';
 
+enum EnvVar {
+    IG_HANDLES = 'IG_HANDLES',
+    IG_CYCLE_DUR_SEC = 'IG_CYCLE_DUR_SEC',
+    IG_JITTER_SEC = 'IG_JITTER_SEC',
+    IG_COOKIE = 'IG_COOKIE',
+    IG_APP_ID = 'IG_APP_ID'
+}
 
 export class StatsService implements Service {
     public readonly name = 'Stats';
-    public readonly environmentVariables = [
-        'IG_HANDLES',
-        'IG_CYCLE_DUR_SEC',
-        'IG_JITTER_SEC',
-        'IG_COOKIE'
-    ];
+    public readonly environmentVariables = Object.keys(EnvVar);
 
     private readonly influxService: InfluxService;
     private readonly options: RequestInit = {
-        headers: {
+        'headers': {
             'sec-fetch-site': 'same-site',
-        }
+            // 'user-agent': 'Instagram 250.0.0.0.0'
+        },
+        'body': null,
+        'method': 'GET'
     };
 
     private timeBetweenAccounts: Duration;
@@ -31,8 +36,8 @@ export class StatsService implements Service {
         this.influxService = influxService;
     }
 
-    init(envVars: Record<string, string>): Promise<void> {
-        const handles: string[] = JSON.parse(envVars.IG_HANDLES);
+    init(envVars: Record<EnvVar, string>): Promise<void> {
+        const handles: string[] = JSON.parse(envVars .IG_HANDLES);
         const fullUpdateCycle: Duration = Duration.fromObject({seconds: parseInt(envVars.IG_CYCLE_DUR_SEC)});
 
         this.options.headers['cookie'] = envVars.IG_COOKIE;
@@ -104,15 +109,13 @@ export class StatsService implements Service {
 
                 return response.json();
             })
-            .then(data => {
-                const user = data.data.user;
-                return {
-                    handle,
-                    followers: user.edge_followed_by.count,
-                    following: user.edge_follow.count,
-                    posts: user.edge_owner_to_timeline_media.count
-                }
-            });
+            .then((json) => json.data.user)
+            .then((user) => ({
+                handle,
+                followers: user.edge_followed_by.count,
+                following: user.edge_follow.count,
+                posts: user.edge_owner_to_timeline_media.count
+            }));
     }
 
     private writeStats(stats: Stats): Promise<void> {
