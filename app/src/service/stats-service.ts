@@ -21,7 +21,7 @@ export class StatsService implements Service {
     private readonly options: RequestInit = {
         'headers': {
             'sec-fetch-site': 'same-site',
-            // 'user-agent': 'Instagram 250.0.0.0.0'
+            'user-agent': 'Instagram 250.0.0.0.0'
         },
         'body': null,
         'method': 'GET'
